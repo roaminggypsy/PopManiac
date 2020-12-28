@@ -31,8 +31,7 @@ function Navbar() {
     <>
       <nav className='navbar'>
         <Link to='/' className='navbar-logo' onClick={closeMobileMenu}>
-          Music
-          <i class='fab fa-firstdraft' />
+          <i class='fab fa-firstdraft' /> Pop Maniac
         </Link>
         <div className='menu-icon' onClick={handleClick}>
           <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
@@ -40,7 +39,7 @@ function Navbar() {
         <ul className={click ? 'nav-menu active' : 'nav-menu'}>
           <li className='nav-item'>
             <Link to='/' className='nav-links' onClick={closeMobileMenu}>
-              Home
+              New Releases
             </Link>
           </li>
           <li
@@ -63,15 +62,11 @@ function Navbar() {
             </Link>
           </li>
           <li className='nav-item'>
-            <Link
-              to='/contact-us'
-              className='nav-links'
-              onClick={closeMobileMenu}
-            >
-              Contact Us
+            <Link to='/tweets' className='nav-links' onClick={closeMobileMenu}>
+              Tweets
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to='/sign-up'
               className='nav-links-mobile'
@@ -79,9 +74,9 @@ function Navbar() {
             >
               Sign Up
             </Link>
-          </li>
+          </li> */}
         </ul>
-        <Button />
+        {/* <Button /> */}
       </nav>
     </>
   );

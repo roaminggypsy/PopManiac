@@ -23,7 +23,7 @@ export default function News() {
   return (
     <React.Fragment>
       <CssBaseline />
-      <Container maxWidth='md'>
+      <Container maxWidth='lg'>
         {allNews.map((n) => (
           <Card key={n.id} news={n} />
         ))}
