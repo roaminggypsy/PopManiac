@@ -4,15 +4,16 @@
   top: 80px;
   list-style: none;
   text-align: start;
+  z-index: 5;
 }
 
 .dropdown-menu li {
-  background: #1888ff;
+  background: black;
   cursor: pointer;
 }
 
 .dropdown-menu li:hover{
-  background: #5cabff;
+  background: rgb(51, 158, 131);
 }
 
 .dropdown-menu.clicked {
