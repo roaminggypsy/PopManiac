@@ -4,30 +4,65 @@ import Card from './Card';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
 import axios from 'axios';
+import { InfiniteLoader, List, AutoSizer } from 'react-virtualized';
+
+const remoteRowCount = 40;
 
 export default function News() {
   const [allNews, setAllNews] = useState([]);
 
-  useEffect(() => {
+  function isRowLoaded({ index }) {
+    return !!allNews[index];
+  }
+
+  function loadMoreRows({ startIndex, stopIndex }) {
     axios
-      .get('/news')
+      .get('/news?page=' + (allNews.length / 10 + 1))
       .then(function (response) {
         // console.log(response.data.response);
-        setAllNews(response.data.response.results);
-        console.log(response.data.response.results.length);
+        setAllNews([...allNews, ...response.data.response.results]);
       })
       .catch(function (error) {})
       .then(function () {});
-  }, []);
+  }
+
+  function rowRenderer({ key, index, style }) {
+    console.log(allNews[index]);
+    return (
+      <div key={key} style={style}>
+        {allNews[index] === undefined ? (
+          <Card loading={true} />
+        ) : (
+          <Card news={allNews[index]} />
+        )}
+      </div>
+    );
+  }
 
   return (
-    <React.Fragment>
-      <CssBaseline />
-      <Container maxWidth='lg'>
-        {allNews.map((n) => (
-          <Card key={n.id} news={n} />
-        ))}
-      </Container>
-    </React.Fragment>
+    <div style={{ height: '80vh' }}>
+      {/* <CssBaseline /> */}
+      <InfiniteLoader
+        isRowLoaded={isRowLoaded}
+        loadMoreRows={loadMoreRows}
+        rowCount={remoteRowCount}
+      >
+        {({ onRowsRendered, registerChild }) => (
+          <AutoSizer>
+            {({ height, width }) => (
+              <List
+                height={height}
+                onRowsRendered={onRowsRendered}
+                ref={registerChild}
+                rowCount={remoteRowCount}
+                rowHeight={150}
+                rowRenderer={rowRenderer}
+                width={width}
+              />
+            )}
+          </AutoSizer>
+        )}
+      </InfiniteLoader>
+    </div>
   );
 }

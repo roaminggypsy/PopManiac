@@ -46,13 +46,16 @@ export default function Card(props) {
   const news = props.news;
   console.log(news);
 
-  const elements = props.news.blocks.body[0].elements;
+  const elements = props.news && props.news.blocks.body[0].elements;
   var imgUrl = '';
-  for (var i = 0; i < elements.length; i++) {
-    if (elements[i].type === 'image') {
-      imgUrl = elements[i].assets[0].file;
-      console.log(imgUrl);
-      break;
+
+  if (elements !== undefined) {
+    for (var i = 0; i < elements.length; i++) {
+      if (elements[i].type === 'image') {
+        imgUrl = elements[i].assets[0].file;
+        console.log(imgUrl);
+        break;
+      }
     }
   }
 
@@ -63,12 +66,17 @@ export default function Card(props) {
   return (
     <CardWrapper>
       <Img src={imgUrl} />
-      {news && (
+      {news !== undefined ? (
         <Text>
           <Title>{news['webTitle']}</Title>
           <Summary>
             {news.blocks.body[0].bodyTextSummary.substring(0, 400)}...
           </Summary>
+        </Text>
+      ) : (
+        <Text>
+          <Title>Loading</Title>
+          <Summary>Loading...</Summary>
         </Text>
       )}
     </CardWrapper>
