@@ -63,8 +63,14 @@ export default function Card(props) {
     imgUrl = 'https://assets.guim.co.uk/images/apps/app-logo.png';
   }
 
+  function onClick() {
+    if (news !== undefined) {
+      window.open(news.webUrl, '_blank');
+    }
+  }
+
   return (
-    <CardWrapper>
+    <CardWrapper onClick={onClick}>
       <Img src={imgUrl} />
       {news !== undefined ? (
         <Text>

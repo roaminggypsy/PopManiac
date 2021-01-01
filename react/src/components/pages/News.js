@@ -41,7 +41,6 @@ export default function News() {
 
   return (
     <div style={{ height: '80vh' }}>
-      {/* <CssBaseline /> */}
       <InfiniteLoader
         isRowLoaded={isRowLoaded}
         loadMoreRows={loadMoreRows}

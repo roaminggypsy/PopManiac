@@ -66,6 +66,15 @@ function Navbar() {
               Tweets
             </Link>
           </li>
+          <li className='nav-item'>
+            <Link
+              to='/playlists'
+              className='nav-links'
+              onClick={closeMobileMenu}
+            >
+              Build PlayLists
+            </Link>
+          </li>
           {/* <li>
             <Link
               to='/sign-up'

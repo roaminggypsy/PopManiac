@@ -5,6 +5,7 @@ const cheerio = require('cheerio');
 const bodyParser = require('body-parser'); // parse the request and create req.body object
 const cors = require('cors'); // provides Express middleware to enable CORS
 const db = require('./app/models');
+const socket = require('socket.io');
 const Role = db.role;
 
 const spotifyChartUrl = 'https://spotifycharts.com/regional';
@@ -16,7 +17,7 @@ const spotifyNewReleasesUrl =
   'https://api.spotify.com/v1/browse/new-releases?market=US&Authorization=Bearer BQDxQb14-U8v-3149qwwxiXN_6Ec0I5VFavStrQID4LqqRU7WZBgPnMeUES5lSekoJFJGtE_7AbDuHDdoetp2W-xvZeTyD0z7Cnb_C1lDM8Kdhwqfk3bYSX0khzNbhaAqLlpSiZMMgc8NMC';
 const billboardHot100Url = 'https://www.billboard.com/charts/hot-100';
 var corsOptions = {
-  origin: 'http://localhost:8081',
+  origin: 'http://localhost:3000',
 };
 const port = process.env.PORT || 8000;
 const MongoClient = require('mongodb').MongoClient;
@@ -27,6 +28,69 @@ app.use(bodyParser.json()); // parse requests of content-type - application/json
 app.use(bodyParser.urlencoded({ extended: true })); // parse requests of content-type - application/x-www-form-urlencoded
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
+require('./app/routes/playlist.routes')(app);
+
+const Song = require('./app/models/song.model');
+const Playlist = require('./app/models/playlist.model');
+const server = require('http').createServer(app);
+server.listen(port, () => console.log('Example app listening'));
+
+const io = socket(server);
+io.on('connection', (socket) => {
+  console.log('herrree');
+  // Once a client has connected, we expect to get a ping from them saying what queue they want to join
+  socket.on('joinPlaylist', function (playlist) {
+    // subscribe the socket to a given channel(room)
+    console.log('about to join');
+    socket.join(playlist);
+  });
+
+  // When we receive a ping from a client telling to add a song, we update the database then send the data back through Sockets
+  socket.on('song:add', function (playlistId, data) {
+    Playlist.findOne({ _id: playlistId }, function (err, playlist) {
+      if (err) {
+      } else {
+        if (playlist) {
+          Song.create(
+            {
+              title: data.title,
+              artist: data.artist,
+              yt_id: data.yt_id,
+            },
+            function (err, song) {
+              Playlist.updateOne(
+                { _id: playlistId },
+                { $push: { songs: song } },
+                { upsert: true },
+                function (err, data) {
+                  if (err) {
+                  } else {
+                    // sending to all clients in the {playlistId} room, including (in) the sender
+                    io.sockets.in(playlistId).emit('song:add', song);
+                  }
+                }
+              );
+            }
+          );
+        } else {
+        }
+      }
+    });
+  });
+
+  // When we receive a ping from a client to delete a song, we update the database and send the data back through Sockets
+  socket.on('song:remove', function (playlistId, masterKey, _id) {
+    SongQueue.findOneAndUpdate(
+      { _id: playlistId, masterKey: masterKey },
+      { $pull: { songs: _id } },
+      function (err, data) {
+        if (!err && data !== null) {
+          io.sockets.in(playlistId).emit('song:remove', _id);
+        }
+      }
+    );
+  });
+});
 
 async function main() {
   const uri =
@@ -210,8 +274,9 @@ async function getSpotifySingleDay(urlSuffix) {
 }
 
 app.get('/news', async (req, res) => {
+  const page = req.query.page;
   axios
-    .get(guardianUrl)
+    .get(guardianUrl + '&page=' + page)
     .then(function (response) {
       // handle success
       console.log(response.data);
@@ -273,4 +338,4 @@ app.get('/billboardHot100', async (req, res) => {
   res.send(hot100);
 });
 
-app.listen(port, () => console.log('Example app listening'));
+//server.listen(port);
