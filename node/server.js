@@ -37,7 +37,6 @@ server.listen(port, () => console.log('Example app listening'));
 
 const io = socket(server);
 io.on('connection', (socket) => {
-  console.log('herrree');
   // Once a client has connected, we expect to get a ping from them saying what queue they want to join
   socket.on('joinPlaylist', function (playlist) {
     // subscribe the socket to a given channel(room)
@@ -188,6 +187,7 @@ function last7Days(date) {
   for (let i = 0; i < 7; i++) {
     let past = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     past.setDate(past.getDate() - i);
+    console.log(date.getMonth());
     result.push(past);
   }
   return result;
@@ -207,18 +207,22 @@ app.get('/spotify', async (req, res) => {
     if (req.query.lastWeek === '1') {
       dateSuffixs = last7Days(
         new Date(req.query.year, req.query.month - 1, req.query.day)
-      ).map(
-        (date) =>
+      ).map((date) => {
+        const month = (date.getMonth() < 10 ? '0' : '') + (date.getMonth() + 1);
+        return (
           '/global/daily/' +
           date.getFullYear() +
           '-' +
-          (date.getMonth() + 1) +
+          month +
           '-' +
           date.getDate()
-      );
+        );
+      });
+      console.log(dateSuffixs);
       for (var i = 0; i < dateSuffixs.length; i++) {
         charts.push(await getSpotifySingleDay(dateSuffixs[i]));
       }
+      // console.log(charts);
     } else {
       charts.push(
         await getSpotifySingleDay(
@@ -232,45 +236,52 @@ app.get('/spotify', async (req, res) => {
       );
     }
   } else {
-    charts.push(await getSpotifySingleDay(''));
+    let chart = await getSpotifySingleDay('');
+    charts.push(chart);
   }
 
   res.send(charts);
 });
 
 async function getSpotifySingleDay(urlSuffix) {
-  const result = await axios.get(spotifyChartUrl + urlSuffix);
-  const $ = await cheerio.load(result.data);
-  let spotifyChart = { date: '', rankings: [] };
+  try {
+    let response = await axios.get(spotifyChartUrl + urlSuffix);
 
-  spotifyChart.date = $('div[data-type=date] div').text();
+    const $ = cheerio.load(response.data);
+    let spotifyChart = { date: '', rankings: [] };
 
-  $('tr').each(function (i, elem) {
-    const image = $('.chart-table-image > a > img', this).attr('src');
-    const rank = $('.chart-table-position', this).text();
-    let trend = $('.chart-table-trend__icon svg', this).attr('fill');
-    if (trend == '#bd3200') {
-      trend = Trend.down;
-    } else if (trend == '#3e3e40') {
-      trend = Trend.same;
-    } else if (trend == '#84bd00') {
-      trend = Trend.up;
-    } else if (trend == '#4687d7') {
-      trend = Trend.new;
-    }
-    const track = $('.chart-table-track > strong', this).text();
-    const artist = $('.chart-table-track > span', this)
-      .text()
-      .replace('by ', '');
-    const streams = $('.chart-table-streams', this).text();
+    spotifyChart.date = $('div[data-type=date] div').text();
 
-    spotifyChart.rankings.push(
-      new SpotifyData(image, rank, trend, track, artist, streams)
-    );
-  });
-  // remove table head
-  spotifyChart.rankings.shift();
-  return spotifyChart;
+    $('tr').each(function (i, elem) {
+      const image = $('.chart-table-image > a > img', this).attr('src');
+      const rank = $('.chart-table-position', this).text();
+      let trend = $('.chart-table-trend__icon svg', this).attr('fill');
+      if (trend == '#bd3200') {
+        trend = Trend.down;
+      } else if (trend == '#3e3e40') {
+        trend = Trend.same;
+      } else if (trend == '#84bd00') {
+        trend = Trend.up;
+      } else if (trend == '#4687d7') {
+        trend = Trend.new;
+      }
+      const track = $('.chart-table-track > strong', this).text();
+      const artist = $('.chart-table-track > span', this)
+        .text()
+        .replace('by ', '');
+      const streams = $('.chart-table-streams', this).text();
+
+      spotifyChart.rankings.push(
+        new SpotifyData(image, rank, trend, track, artist, streams)
+      );
+    });
+    // remove table head
+    spotifyChart.rankings.shift();
+    console.log(spotifyChart.rankings.length);
+    return spotifyChart;
+  } catch (err) {
+    // console.log(err);
+  }
 }
 
 app.get('/news', async (req, res) => {
@@ -279,7 +290,6 @@ app.get('/news', async (req, res) => {
     .get(guardianUrl + '&page=' + page)
     .then(function (response) {
       // handle success
-      console.log(response.data);
       res.send(response.data);
     })
     .catch(function (error) {

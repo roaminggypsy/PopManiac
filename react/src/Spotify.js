@@ -102,7 +102,7 @@ const Spotify = (props) => {
   );
 
   const chartData = useMemo(() => {
-    if (chart.length === 0) {
+    if (chart === undefined || chart.length === 0) {
       return [];
     } else {
       return chart.rankings;
@@ -118,6 +118,7 @@ const Spotify = (props) => {
         (result) => {
           console.log(result);
           setChart(result[0]);
+          console.log(chart);
           console.log(result[0].date);
           const dateData = result[0].date
             .split('/')
@@ -178,8 +179,11 @@ const Spotify = (props) => {
           //   console.log(lineData[i].id);
           // }
           setLineChartData(lineData);
+          console.log(lineData);
         })
-        .catch(function (error) {})
+        .catch(function (error) {
+          console.log(error);
+        })
         .then(function () {});
     }
   }, [isLoaded]);
