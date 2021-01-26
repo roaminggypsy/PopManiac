@@ -23,7 +23,6 @@ export default function Playlist(props) {
 
   useEffect(() => {
     // equivalent of ComponentDidMount
-
     axios
       .get('/api/playlist/' + playlistId)
       .then(function (response) {
@@ -103,7 +102,7 @@ export default function Playlist(props) {
               <input
                 className='form-control'
                 type='text'
-                value={window.location.host + '/q/' + playlistId}
+                value={window.location.host + '/playlists/' + playlistId}
                 readOnly
               ></input>
 
@@ -136,7 +135,7 @@ export default function Playlist(props) {
                     type='text'
                     value={
                       window.location.host +
-                      '/playlist/' +
+                      '/playlists/' +
                       playlistId +
                       '/master?key=' +
                       masterKey
