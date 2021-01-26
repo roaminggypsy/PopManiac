@@ -1,10 +1,32 @@
 import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
+import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 
 const axios = require('axios');
 
+const useStyles = makeStyles({
+  root: {
+    minWidth: 275,
+    margin: '10%',
+  },
+  title: {
+    fontSize: 14,
+  },
+  pos: {
+    marginBottom: 12,
+  },
+});
+
 export default function Playlists(props) {
+  const classes = useStyles();
+
   let history = useHistory();
   function createQueue() {
     axios
@@ -20,30 +42,44 @@ export default function Playlists(props) {
       .then(function () {});
   }
   return (
-    <div id='landing'>
-      <div className='container'>
-        <div className='row'>
-          <div className='col-md-4 col-md-offset-2 text-center'>
-            <h2>Create a Playlist</h2>
-
-            <p className='lead'>
+    <Grid container spacing={3}>
+      <Grid item xs={6}>
+        <Card className={classes.root}>
+          <CardContent>
+            <Typography variant='h5' component='h2'>
+              Create a Playlist
+            </Typography>
+            <Typography variant='body2' component='p'>
               Start a session and let your friends contribute to the vibes
-            </p>
-            <button className='btn btn-lg btn-primary' onClick={createQueue}>
-              Create <i className='glyphicon glyphicon-plus'></i>
-            </button>
-          </div>
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button size='small' onClick={createQueue}>
+              Let's create
+            </Button>
+          </CardActions>
+        </Card>
+      </Grid>
 
-          <div className='col-md-4 text-center'>
-            <h2>Join a Playlist</h2>
-
-            <p className='lead'>Join an already existing session and jam</p>
-            <Link to={'/playlists/join'} className='btn btn-lg btn-primary'>
-              Join <i className='glyphicon glyphicon-play'></i>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Grid item xs={6}>
+        <Card className={classes.root}>
+          <CardContent>
+            <Typography variant='h5' component='h2'>
+              Join a Playlist
+            </Typography>
+            <Typography variant='body2' component='p'>
+              Join an already existing session and jam
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button size='small'>
+              <Link to={'/playlists/join'} style={{ textDecoration: 'none' }}>
+                Let's go
+              </Link>
+            </Button>
+          </CardActions>
+        </Card>
+      </Grid>
+    </Grid>
   );
 }
