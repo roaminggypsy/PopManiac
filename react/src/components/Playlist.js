@@ -3,18 +3,39 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import AddSong from './AddSong';
 import Song from './Song';
+import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
 
 const axios = require('axios');
 const socket = io('localhost:3000');
+
+const useStyles = makeStyles({
+  root: {
+    minWidth: 275,
+  },
+  title: {
+    fontSize: 14,
+  },
+  pos: {
+    marginBottom: 12,
+  },
+});
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
 export default function Playlist(props) {
-  const [songs, setSongs] = useState([]);
+  const classes = useStyles();
+  const [songs, setSongs] = useState(['b']);
   const [isMaster, setisMaster] = useState(false);
   const [masterKey, setMasterKey] = useState('');
+  console.log(songs);
 
   let query = useQuery();
   let history = useHistory();
@@ -22,6 +43,7 @@ export default function Playlist(props) {
   const playlistId = props.match.params.id;
 
   useEffect(() => {
+    console.log('useEfffect');
     // equivalent of ComponentDidMount
     axios
       .get('/api/playlist/' + playlistId)
@@ -47,6 +69,8 @@ export default function Playlist(props) {
       .catch(function (err) {})
       .then(function () {});
 
+    setMasterKey(query.get('key'));
+
     // On connection, send a signal to join the playlist's stream
     socket.on('connect', (data) => {
       console.log('connectt!!');
@@ -56,23 +80,31 @@ export default function Playlist(props) {
     socket.on('connect_error', (error) => console.log(error));
 
     // When we receive a 'song:add' symbol, add the data to our song array
-    socket.on('song:add', addSong);
+    socket.on('song:add', (song) => addSong(song));
 
     // When we receive a 'song:remove' symbol, remove the song from the array
-    socket.on('song:remove', removeSong);
+    socket.on('song:remove', (_id) => removeSong(_id));
 
-    // console.log(props);
-    // console.log(query.get('key'));
-    return () => socket.disconnect();
+    return () => {
+      socket.off('song:add');
+      socket.off('song:remove');
+      socket.disconnect();
+    };
   }, []);
 
   function addSong(song) {
-    setSongs([...songs, song]);
+    console.log(song);
+    console.log(songs);
+    setSongs((prevSongs) => {
+      return [...prevSongs, song];
+    });
     console.log(songs);
   }
 
   function removeSong(id) {
-    setSongs(songs.filter((song) => song._id !== id));
+    console.log(songs);
+    console.log(id);
+    setSongs((prevSongs) => prevSongs.filter((song) => song._id !== id));
   }
 
   const songElements = songs.map((song, i) => (
@@ -84,19 +116,27 @@ export default function Playlist(props) {
       qId={playlistId}
       masterKey={masterKey}
       isMaster={isMaster}
+      playlistId={playlistId}
     />
   ));
 
   return (
-    <div id='playlist'>
-      <div className='container'>
-        <div className='col-md-5 col-md-push-7'>
-          <div className='panel panel-default'>
-            <div className='panel-heading'>
-              <h4>Playlist ID: {playlistId}</h4>
-            </div>
+    <Grid container spacing={3}>
+      <Grid item xs={12} sm={7}>
+        {songs.length !== 0 ? songElements : 'Empty'}
+      </Grid>
 
-            <div className='panel-body'>
+      <Grid item xs={12} sm={5}>
+        <Card className={classes.root}>
+          <CardContent>
+            <Typography
+              className={classes.title}
+              color='textSecondary'
+              gutterBottom
+            >
+              Playlist ID: {playlistId}
+            </Typography>
+            <Typography className={classes.pos} color='textSecondary'>
               <label>Share URL (Share with friends)</label>
 
               <input
@@ -105,12 +145,13 @@ export default function Playlist(props) {
                 value={window.location.host + '/playlists/' + playlistId}
                 readOnly
               ></input>
-
+            </Typography>
+            {/* <Typography variant='body2' component='p'>
               {isMaster === true ? (
                 <div>
                   <br />
 
-                  {/* <Alert
+                  <Alert
                     message={
                       'You are the master of this AuxQ! ' +
                       'This means you are the main source of audio and can delete songs. ' +
@@ -119,7 +160,7 @@ export default function Playlist(props) {
                     }
                     type='info'
                     key='errorAlert'
-                  /> */}
+                  />
 
                   <div>
                     You are the master of this AuxQ! This means you are the main
@@ -144,16 +185,16 @@ export default function Playlist(props) {
                   ></input>
                 </div>
               ) : null}
-            </div>
-          </div>
+            </Typography> */}
+          </CardContent>
+        </Card>
 
-          <AddSong socket={socket} playlistId={playlistId} />
-        </div>
-
-        <div className='col-md-7 col-md-pull-5'>
-          {songs.length !== 0 ? songElements : 'Empty'}
-        </div>
-      </div>
-    </div>
+        <Card>
+          <CardContent>
+            <AddSong socket={socket} playlistId={playlistId} />
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 }

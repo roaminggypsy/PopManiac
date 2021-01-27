@@ -49,7 +49,7 @@ export default function Song(props) {
 
       {isMaster ? (
         <div className='panel-footer text-right'>
-          <button className='btn btn-danger' onClick={this._deleteSong}>
+          <button className='btn btn-danger' onClick={deleteSong}>
             Delete
           </button>
         </div>

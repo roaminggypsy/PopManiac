@@ -48,6 +48,7 @@ io.on('connection', (socket) => {
   socket.on('song:add', function (playlistId, data) {
     Playlist.findOne({ _id: playlistId }, function (err, playlist) {
       if (err) {
+        console.log(err);
       } else {
         if (playlist) {
           Song.create(
@@ -72,6 +73,7 @@ io.on('connection', (socket) => {
             }
           );
         } else {
+          console.log('the playlist does not exist');
         }
       }
     });
@@ -79,11 +81,17 @@ io.on('connection', (socket) => {
 
   // When we receive a ping from a client to delete a song, we update the database and send the data back through Sockets
   socket.on('song:remove', function (playlistId, masterKey, _id) {
-    SongQueue.findOneAndUpdate(
+    console.log(playlistId);
+    console.log(masterKey);
+    console.log(_id);
+    Playlist.findOneAndUpdate(
       { _id: playlistId, masterKey: masterKey },
       { $pull: { songs: _id } },
-      function (err, data) {
-        if (!err && data !== null) {
+      function (err, doc) {
+        console.log(err);
+        console.log(doc);
+        if (!err && doc !== null) {
+          console.log('here');
           io.sockets.in(playlistId).emit('song:remove', _id);
         }
       }
@@ -103,6 +111,7 @@ async function main() {
     .connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useFindAndModify: false,
     })
     .then(() => {
       console.log('Successfully connect to MongoDB. ');
