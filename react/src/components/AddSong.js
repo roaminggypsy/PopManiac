@@ -1,4 +1,17 @@
 import React, { useState } from 'react';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardActions from '@material-ui/core/CardActions';
+import styled from 'styled-components';
+
+const StyledCard = styled(Card)`
+  margin: 24px;
+  padding: 16px;
+`;
 
 export default function AddSong(props) {
   const [title, setTitle] = useState('');
@@ -67,12 +80,10 @@ export default function AddSong(props) {
   }
 
   return (
-    <div className='panel panel-default'>
-      <div className='panel-heading'>
-        <h4>Add Song</h4>
-      </div>
+    <StyledCard>
+      <CardHeader title='Add A Song'></CardHeader>
 
-      <div className='panel-body'>
+      <CardContent>
         {/* <ReactCSSTransitionGroup
           transitionName='alert'
           transitionEnterTimeout={1000}
@@ -81,53 +92,52 @@ export default function AddSong(props) {
         {error !== '' ? <div>{error}</div> : null}
         {/* </ReactCSSTransitionGroup> */}
 
-        <form onSubmit={handleSubmit}>
-          <div className='form-group'>
-            <label>Title</label>
+        <TextField
+          required
+          id='standard-required'
+          placeholder='Song Name'
+          label='title'
+          name='title'
+          onChange={handleInputChange}
+          value={title}
+          fullWidth
+          margin='normal'
+        />
 
-            <input
-              className='form-control'
-              type='text'
-              placeholder='Love'
-              name='title'
-              onChange={handleInputChange}
-              value={title}
-            ></input>
-          </div>
+        <TextField
+          required
+          id='standard-required'
+          placeholder='Artist'
+          label='artist'
+          name='artist'
+          onChange={handleInputChange}
+          value={artist}
+          fullWidth
+          margin='normal'
+        />
+        <TextField
+          required
+          id='standard-required'
+          placeholder='URL'
+          label='youtube'
+          name='youtube'
+          onChange={handleInputChange}
+          value={youtube}
+          fullWidth
+          margin='normal'
+        />
 
-          <div className='form-group'>
-            <label>Artist</label>
-
-            <input
-              className='form-control'
-              type='text'
-              placeholder='Lana Del Rey'
-              name='artist'
-              onChange={handleInputChange}
-              value={artist}
-            ></input>
-          </div>
-
-          <div className='form-group'>
-            <label>YouTube URL</label>
-
-            <input
-              className='form-control'
-              type='text'
-              placeholder='https://youtu.be/3-NTv0CdFCk'
-              name='youtube'
-              onChange={handleInputChange}
-              value={youtube}
-            ></input>
-          </div>
-
-          <input
+        {/* <input
             className='btn btn-md btn-primary text-right'
             type='submit'
             value='Add'
-          ></input>
-        </form>
-      </div>
-    </div>
+          ></input> */}
+      </CardContent>
+      <CardActions disableSpacing>
+        <Button color='secondary' onClick={handleSubmit}>
+          Add
+        </Button>
+      </CardActions>
+    </StyledCard>
   );
 }

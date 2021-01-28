@@ -81,22 +81,35 @@ io.on('connection', (socket) => {
 
   // When we receive a ping from a client to delete a song, we update the database and send the data back through Sockets
   socket.on('song:remove', function (playlistId, masterKey, _id) {
-    console.log(playlistId);
-    console.log(masterKey);
-    console.log(_id);
     Playlist.findOneAndUpdate(
       { _id: playlistId, masterKey: masterKey },
       { $pull: { songs: _id } },
       function (err, doc) {
-        console.log(err);
-        console.log(doc);
         if (!err && doc !== null) {
-          console.log('here');
           io.sockets.in(playlistId).emit('song:remove', _id);
         }
       }
     );
   });
+
+  socket.on(
+    'song:update',
+    function (playlistId, masterKey, _id, title, artist, ytId) {
+      Song.updateOne(
+        { _id: _id },
+        {
+          $set: {
+            title: title,
+            artist: artist,
+            yt_id: ytId,
+          },
+        },
+        function (err, doc) {
+          console.log(err);
+        }
+      );
+    }
+  );
 });
 
 async function main() {

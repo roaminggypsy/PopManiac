@@ -7,9 +7,12 @@ import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import styled from 'styled-components';
 
 const axios = require('axios');
 const socket = io('localhost:3000');
@@ -25,6 +28,11 @@ const useStyles = makeStyles({
     marginBottom: 12,
   },
 });
+
+const StyledCard = styled(Card)`
+  margin: 24px;
+  padding: 16px;
+`;
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -127,73 +135,52 @@ export default function Playlist(props) {
       </Grid>
 
       <Grid item xs={12} sm={5}>
-        <Card className={classes.root}>
+        <StyledCard className={classes.root}>
+          <CardHeader title='Playlist Info'>Playlist Info</CardHeader>
+
           <CardContent>
-            <Typography
-              className={classes.title}
-              color='textSecondary'
-              gutterBottom
-            >
-              Playlist ID: {playlistId}
-            </Typography>
-            <Typography className={classes.pos} color='textSecondary'>
-              <label>Share URL (Share with friends)</label>
-
-              <input
-                className='form-control'
-                type='text'
-                value={window.location.host + '/playlists/' + playlistId}
-                readOnly
-              ></input>
-            </Typography>
-            {/* <Typography variant='body2' component='p'>
-              {isMaster === true ? (
-                <div>
-                  <br />
-
-                  <Alert
-                    message={
-                      'You are the master of this AuxQ! ' +
-                      'This means you are the main source of audio and can delete songs. ' +
-                      'Only way to access the master page is to use the master URL. ' +
-                      'Keep this to yourself or to people you trust with control!'
-                    }
-                    type='info'
-                    key='errorAlert'
-                  />
-
-                  <div>
-                    You are the master of this AuxQ! This means you are the main
-                    source of audio and can delete songs. Only way to access the
-                    master page is to use the master URL. Keep this to yourself
-                    or to people you trust with control!'
-                  </div>
-
-                  <label>Master URL (Keep for yourself)</label>
-
-                  <input
-                    className='form-control'
-                    type='text'
-                    value={
-                      window.location.host +
-                      '/playlists/' +
-                      playlistId +
-                      '/master?key=' +
-                      masterKey
-                    }
-                    readOnly
-                  ></input>
-                </div>
-              ) : null}
-            </Typography> */}
+            <TextField
+              id='filled-read-only-input'
+              label='Playlist Id'
+              InputProps={{
+                readOnly: true,
+              }}
+              value={playlistId}
+              fullWidth
+              margin='normal'
+            />
+            <TextField
+              id='filled-read-only-input'
+              label='Share URL'
+              InputProps={{
+                readOnly: true,
+              }}
+              value={window.location.host + '/playlists/' + playlistId}
+              fullWidth
+              margin='normal'
+            />
+            {isMaster === true ? (
+              <TextField
+                id='filled-read-only-input'
+                label='Master URL'
+                InputProps={{
+                  readOnly: true,
+                }}
+                value={
+                  window.location.host +
+                  '/playlists/' +
+                  playlistId +
+                  '/master?key=' +
+                  masterKey
+                }
+                fullWidth
+                margin='normal'
+              />
+            ) : null}
           </CardContent>
-        </Card>
+        </StyledCard>
 
-        <Card>
-          <CardContent>
-            <AddSong socket={socket} playlistId={playlistId} />
-          </CardContent>
-        </Card>
+        <AddSong socket={socket} playlistId={playlistId} />
       </Grid>
     </Grid>
   );
