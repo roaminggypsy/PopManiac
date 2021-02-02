@@ -246,14 +246,13 @@ app.get('/spotify', async (req, res) => {
       }
       // console.log(charts);
     } else {
+      let month = req.query.month;
+      if (month.length == 1) {
+        month = '0' + month;
+      }
       charts.push(
         await getSpotifySingleDay(
-          '/global/daily/' +
-            req.query.year +
-            '-' +
-            req.query.month +
-            '-' +
-            req.query.day
+          '/global/daily/' + req.query.year + '-' + month + '-' + req.query.day
         )
       );
     }

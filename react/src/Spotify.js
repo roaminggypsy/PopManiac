@@ -60,8 +60,12 @@ const Spotify = (props) => {
     axios
       .get('/spotify?year=' + year + '&month=' + month + '&day=' + day)
       .then(function (response) {
+        console.log(response);
         setChart(response.data[0]);
-        setLatestDate(response.data.date);
+        const dateData = response.data[0].date
+          .split('/')
+          .map((str) => parseInt(str));
+        setLatestDate(new Date(dateData[2], dateData[0] - 1, dateData[1]));
         setIsLoaded(true);
       })
       .catch(function (error) {})
