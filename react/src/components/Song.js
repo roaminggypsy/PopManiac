@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import YouTube from 'react-youtube';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardHeader';
 import styled from 'styled-components';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -10,7 +9,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -31,6 +29,7 @@ export default function Song(props) {
   console.log(props.song);
 
   function deleteSong() {
+    console.log('here');
     props.socket.emit(
       'song:remove',
       props.playlistId,
@@ -53,6 +52,7 @@ export default function Song(props) {
       artist,
       ytId
     );
+    setOpen(false);
   }
 
   function handleInputChange(e) {

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Table from './components/Table';
 import Container from '@material-ui/core/Container';
 
+import { ResponsiveLine } from '@nivo/line';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
@@ -10,7 +11,7 @@ import NewReleasesIcon from '@material-ui/icons/NewReleases';
 
 import DatePicker from './components/DatePicker';
 
-import { ResponsiveLine } from '@nivo/line';
+// import { Bar } from '@nivo/bar';
 
 const axios = require('axios');
 
@@ -21,26 +22,91 @@ const Trend = Object.freeze({
   '-1': <ArrowDownwardIcon />,
 });
 
+// TODO: nivo running bar chart
+// const BarComponent = (props) => {
+//   return (
+//     <g transform={`translate(${props.x},${props.y})`}>
+//       <rect
+//         x={-3}
+//         y={7}
+//         width={props.width}
+//         height={props.height}
+//         fill='rgba(0, 0, 0, .07)'
+//       />
+//       <rect width={props.width} height={props.height} fill={props.color} />
+//       <rect
+//         x={props.width - 5}
+//         width={5}
+//         height={props.height}
+//         fill={props.borderColor}
+//         fillOpacity={0.2}
+//       />
+//       <text
+//         x={props.width - 16}
+//         y={props.height / 2 - 8}
+//         textAnchor='end'
+//         dominantBaseline='central'
+//         fill='black'
+//         style={{
+//           fontWeight: 900,
+//           fontSize: 15,
+//         }}
+//       >
+//         {props.data.indexValue}
+//       </text>
+//       <text
+//         x={props.width - 16}
+//         y={props.height / 2 + 10}
+//         textAnchor='end'
+//         dominantBaseline='central'
+//         fill={props.borderColor}
+//         style={{
+//           fontWeight: 400,
+//           fontSize: 13,
+//         }}
+//       >
+//         {props.data.value}
+//       </text>
+//     </g>
+//   );
+// };
+
 const Spotify = (props) => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [chart, setChart] = useState([]);
   const [latestDate, setLatestDate] = useState(new Date());
   const [lineChartData, setLineChartData] = useState([]);
+  // const [last7DaysData, setLasy7DaysData] = useState([]);
+  // const [current, setCurrent] = useState(0);
+  // const [idx, setIdx] = useState(6);
 
-  function last7Days(date) {
-    let result = [];
-    console.log(date);
-    for (let i = 0; i < 7; i++) {
-      let past = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      past.setDate(past.getDate() - i);
-      result.push(past);
-    }
-    return result;
-  }
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIdx((prevIdx) => prevIdx - 1);
+  //     setCurrent(current + 1);
+  //   }, 1400);
+  //   return () => clearTimeout(timer);
+  // }, [current, setCurrent]);
+
+  // const barData =
+  //   idx < last7DaysData.length && 0 <= idx
+  //     ? last7DaysData[idx].rankings.slice(0, 2)
+  //     : [];
+
+  // function last7Days(date) {
+  //   let result = [];
+  //   console.log(date);
+  //   for (let i = 0; i < 7; i++) {
+  //     let past = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  //     past.setDate(past.getDate() - i);
+  //     result.push(past);
+  //   }
+  //   return result;
+  // }
 
   function coverCell({ row }) {
-    return <img src={row.original.image} />;
+    return <img src={row.original.image} alt='cover' />;
   }
 
   function streamCell({ row }) {
@@ -106,7 +172,7 @@ const Spotify = (props) => {
   );
 
   const chartData = useMemo(() => {
-    if (chart === undefined || chart.length === 0) {
+    if (!chart || chart.length === 0) {
       return [];
     } else {
       return chart.rankings;
@@ -122,7 +188,6 @@ const Spotify = (props) => {
         (result) => {
           console.log(result);
           setChart(result[0]);
-          console.log(chart);
           console.log(result[0].date);
           const dateData = result[0].date
             .split('/')
@@ -153,6 +218,12 @@ const Spotify = (props) => {
         )
         .then(function (response) {
           const resData = response.data;
+          console.log(resData); // {date: "02/02/2021", rankings: Array(200)}s
+          // setLasy7DaysData(resData);
+          /**
+           * Code for line chart data (array)
+           * Each element is {id: song name, data: arr of rankings in the past 7 days (if in top 10)}
+           */
           let lineData = [];
           for (let dateIdx = 6; dateIdx > 0; dateIdx--) {
             const date = resData[dateIdx].date;
@@ -179,18 +250,14 @@ const Spotify = (props) => {
               }
             }
           }
-          // for (let i = 0; i < lineData.length; i++) {
-          //   console.log(lineData[i].id);
-          // }
           setLineChartData(lineData);
-          console.log(lineData);
         })
         .catch(function (error) {
           console.log(error);
         })
         .then(function () {});
     }
-  }, [isLoaded]);
+  }, [isLoaded, latestDate]);
 
   const MyResponsiveLine = ({ data /* see data tab */ }) => (
     <ResponsiveLine

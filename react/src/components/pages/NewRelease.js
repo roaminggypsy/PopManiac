@@ -8,6 +8,7 @@ export default function NewRelease() {
       <Title text='Spotify New Releases' />
       <iframe
         src='https://open.spotify.com/embed/playlist/37i9dQZF1DX4JAvHpjipBk'
+        title='New Releases from Spotify'
         width='100%'
         height='400'
         frameborder='0'
@@ -17,6 +18,7 @@ export default function NewRelease() {
       <Title text='Apple Music New Releases' />
       <iframe
         allow='autoplay *; encrypted-media *; fullscreen *'
+        title='New Releases from Apple Musics'
         frameborder='0'
         height='400'
         style={{
@@ -29,6 +31,7 @@ export default function NewRelease() {
       ></iframe>
       <Title text='Youtube Vevo New Releases' />
       <iframe
+        title='New Releases from Youtube Vevo'
         width='100%'
         height='600px'
         src='https://www.youtube.com/embed/videoseries?list=PL9tY0BWXOZFtwzdsm2-EL-4tiR0EqRPz1'

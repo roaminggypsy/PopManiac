@@ -5,15 +5,11 @@ import AddSong from './AddSong';
 import Song from './Song';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import styled from 'styled-components';
-
 const axios = require('axios');
 const socket = io('localhost:3000');
 
@@ -88,10 +84,17 @@ export default function Playlist(props) {
     socket.on('connect_error', (error) => console.log(error));
 
     // When we receive a 'song:add' symbol, add the data to our song array
-    socket.on('song:add', (song) => addSong(song));
+    socket.on('song:add', (song) => {
+      setSongs((prevSongs) => {
+        return [...prevSongs, song];
+      });
+    });
 
     // When we receive a 'song:remove' symbol, remove the song from the array
-    socket.on('song:remove', (_id) => removeSong(_id));
+    socket.on('song:remove', (_id) => {
+      console.log('here');
+      setSongs((prevSongs) => prevSongs.filter((song) => song._id !== _id));
+    });
 
     return () => {
       socket.off('song:add');
@@ -99,21 +102,6 @@ export default function Playlist(props) {
       socket.disconnect();
     };
   }, []);
-
-  function addSong(song) {
-    console.log(song);
-    console.log(songs);
-    setSongs((prevSongs) => {
-      return [...prevSongs, song];
-    });
-    console.log(songs);
-  }
-
-  function removeSong(id) {
-    console.log(songs);
-    console.log(id);
-    setSongs((prevSongs) => prevSongs.filter((song) => song._id !== id));
-  }
 
   const songElements = songs.map((song, i) => (
     <Song

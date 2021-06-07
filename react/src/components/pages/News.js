@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../../App.css';
 import Card from './Card';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Container from '@material-ui/core/Container';
 import axios from 'axios';
 import { InfiniteLoader, List, AutoSizer } from 'react-virtualized';
 

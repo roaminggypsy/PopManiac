@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 export default function JoinPlaylist() {
-  const [isValid, setIsValid] = useState(true);
+  // const [isValid, setIsValid] = useState(true);
   const [playlistId, setPlaylistId] = useState('');
 
   function handleInputChange(e) {
