@@ -29,14 +29,20 @@
 A platform that focus on pop music.  
 You can explore new music from Spotify, Apple Music and Youtube.  
 <img src="https://res.cloudinary.com/lipadupa/image/upload/v1611009367/pop1_amj591.png">
+
 You can check out spotify charts.  
 <img src="https://res.cloudinary.com/lipadupa/image/upload/v1611009367/pop2_pzsxi6.png">
 & checkout how top 10 changes over the past week.
 <img src="https://res.cloudinary.com/lipadupa/image/upload/v1611009367/pop3_alfjst.png">
+
 You can read latest pop music news.
 <img src="https://res.cloudinary.com/lipadupa/image/upload/v1611009367/pop4_vncudq.png">
 & Follow latest tweets
 <img src="https://res.cloudinary.com/lipadupa/image/upload/v1611009367/pop5_qcp1tx.png">
+
+You can create a collaborative Youtube playlist, and edit it with friends in real-time
+<img src="introtoplaylists.png">
+<img src="PlayList.png">
 
 <!--
 ## 🔧 Running the tests <a name = "tests"></a>

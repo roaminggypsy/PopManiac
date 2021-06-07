@@ -231,14 +231,8 @@ app.get('/spotify', async (req, res) => {
         new Date(req.query.year, req.query.month - 1, req.query.day)
       ).map((date) => {
         const month = (date.getMonth() < 10 ? '0' : '') + (date.getMonth() + 1);
-        return (
-          '/global/daily/' +
-          date.getFullYear() +
-          '-' +
-          month +
-          '-' +
-          date.getDate()
-        );
+        const day = (date.getDate() < 10 ? '0' : '') + date.getDate();
+        return '/global/daily/' + date.getFullYear() + '-' + month + '-' + day;
       });
       console.log(dateSuffixs);
       for (var i = 0; i < dateSuffixs.length; i++) {
@@ -247,12 +241,16 @@ app.get('/spotify', async (req, res) => {
       // console.log(charts);
     } else {
       let month = req.query.month;
-      if (month.length == 1) {
+      if (month.length === 1) {
         month = '0' + month;
+      }
+      let day = req.query.day;
+      if (day.length === 1) {
+        day = '0' + day;
       }
       charts.push(
         await getSpotifySingleDay(
-          '/global/daily/' + req.query.year + '-' + month + '-' + req.query.day
+          '/global/daily/' + req.query.year + '-' + month + '-' + day
         )
       );
     }
